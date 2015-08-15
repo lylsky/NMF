@@ -5,6 +5,7 @@ package lyl.nmf;
  */
 public class NMF {
     public static void main(String[] args){
+        System.out.print("dddd");
 
     }
 }
