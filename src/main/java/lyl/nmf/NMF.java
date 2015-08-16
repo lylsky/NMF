@@ -78,6 +78,33 @@ public class NMF {
         //Math.
     }
 
+    public void MVCMNF() {
+        float muA = 3;
+        float muS = 3;
+        float tauA = (float)0.005;
+        float stu = 2;
+        float tol = (float) 1e-4;
+        int maxiter = 500;
+        float lambdaA = 5;
+
+        int I = X.length;
+        int L = X[0].length;
+
+        float[][] Up = new float[L][J];
+        float[][] D = new float[J][J];
+        float[][] Vp = new float[I][J];
+        float[][] XVp = new float[L][J];
+        float[][] UptX = new float[J][I];
+        float[][] eUptX = new float[J + 1][I];
+        float[][] eX = new float[L + 1][I];
+        float[][] SSUM = new float[J][I];
+
+        float Ssum;
+        float eX2, Xscale, Rscale, sqrnorm;
+
+
+    }
+
     public static void main(String[] args){
         System.out.print("dddd");
 
