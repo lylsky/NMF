@@ -1,6 +1,7 @@
 package lyl.nmf;
 
 import Jama.Matrix;
+import SVD.SingularValueDecomposition;
 import org.apache.commons.math3.*;
 
 import java.io.BufferedReader;
@@ -87,20 +88,35 @@ public class NMF {
         int maxiter = 500;
         float lambdaA = 5;
 
-        int I = X.length;
-        int L = X[0].length;
+        int P = X.length;
+        int B = X[0].length;
 
-        float[][] Up = new float[L][J];
+        float[][] Up = new float[P][J];
         float[][] D = new float[J][J];
-        float[][] Vp = new float[I][J];
-        float[][] XVp = new float[L][J];
-        float[][] UptX = new float[J][I];
-        float[][] eUptX = new float[J + 1][I];
-        float[][] eX = new float[L + 1][I];
-        float[][] SSUM = new float[J][I];
+        float[][] Vp = new float[B][J];
+        float[][] XVp = new float[P][J];
+        float[][] UptX = new float[J][B];
+        float[][] eXVp = new float[P][J + 1];
+        float[][] eX = new float[P][B + 1];
+        float[][] SSUM = new float[P][J];
 
-        float Ssum;
+        float[] Ssum;
         float eX2, Xscale, Rscale, sqrnorm;
+
+        SingularValueDecomposition svd = new SingularValueDecomposition(X);
+        Up = svd.getU();
+        Vp = svd.getV();
+        D = svd.getS();
+        XVp = Mat.mult(Up, D);
+        UptX = Mat.multTr(D, Vp);
+        eXVp = Mat.addCol(XVp, stu);
+        eX = Mat.addCol(X, stu);
+
+        eX2 = Mat.sum(Mat.elemMult(eX, eX));
+        Xscale = Mat.sum(X);
+        Rscale = Mat.sum(Mat.mult(A, S));
+        sqrnorm = (float)Math.sqrt(Rscale / Xscale);
+
 
 
     }
