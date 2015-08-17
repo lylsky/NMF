@@ -102,20 +102,20 @@ public class NMF {
 
         float[] Ssum;
         float eX2, Xscale, Rscale, sqrnorm;
-
-        SingularValueDecomposition svd = new SingularValueDecomposition(X);
-        Up = svd.getU();
-        Vp = svd.getV();
-        D = svd.getS();
-        XVp = Mat.mult(Up, D);
-        UptX = Mat.multTr(D, Vp);
-        eXVp = Mat.addCol(XVp, stu);
-        eX = Mat.addCol(X, stu);
-
-        eX2 = Mat.sum(Mat.elemMult(eX, eX));
-        Xscale = Mat.sum(X);
-        Rscale = Mat.sum(Mat.mult(A, S));
-        sqrnorm = (float)Math.sqrt(Rscale / Xscale);
+//
+//        SingularValueDecomposition svd = new SingularValueDecomposition(X);
+//        Up = svd.getU();
+//        Vp = svd.getV();
+//        D = svd.getS();
+//        XVp = Mat.mult(Up, D);
+//        UptX = Mat.multTr(D, Vp);
+//        eXVp = Mat.addCol(XVp, stu);
+//        eX = Mat.addCol(X, stu);
+//
+//        eX2 = Mat.sum(Mat.elemMult(eX, eX));
+//        Xscale = Mat.sum(X);
+//        Rscale = Mat.sum(Mat.mult(A, S));
+//        sqrnorm = (float)Math.sqrt(Rscale / Xscale);
 
 
 

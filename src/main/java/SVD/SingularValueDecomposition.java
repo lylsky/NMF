@@ -7,23 +7,24 @@ package SVD;
 import java.io.Serializable;
 
 public class SingularValueDecomposition implements Serializable {
-    private float[][] U;
-    private float[][] V;
-    private float[] s;
+    private double[][] U;
+    private double[][] V;
+    private double[] s;
     private int m;
     private int n;
     private static final long serialVersionUI = 1L;
 
-    public SingularValueDecomposition(float[][] var2) {
-        //float[][] var2 = var1.getArrayCopy();
+    public SingularValueDecomposition(double[][] var2,int n) {
+        //double[][] var2 = var1.getArrayCopy();
         this.m = var2.length;
-        this.n = var2[0].length;
+//        this.n = var2[0].length;
+        this.n = n;
         int var3 = Math.min(this.m, this.n);
-        this.s = new float[Math.min(this.m + 1, this.n)];
-        this.U = new float[this.m][var3];
-        this.V = new float[this.n][this.n];
-        float[] var4 = new float[this.n];
-        float[] var5 = new float[this.m];
+        this.s = new double[Math.min(this.m + 1, this.n)];
+        this.U = new double[this.m][var3];
+        this.V = new double[this.n][this.n];
+        double[] var4 = new double[this.n];
+        double[] var5 = new double[this.m];
         boolean var6 = true;
         boolean var7 = true;
         int var8 = Math.min(this.m - 1, this.n);
@@ -55,7 +56,7 @@ public class SingularValueDecomposition implements Serializable {
                 this.s[var10] = -this.s[var10];
             }
 
-            float var12;
+            double var12;
             int var14;
             for(var11 = var10 + 1; var11 < this.n; ++var11) {
                 if(var10 < var8 & this.s[var10] != 0) {
@@ -143,7 +144,7 @@ public class SingularValueDecomposition implements Serializable {
         }
 
         var4[var10 - 1] = 0;
-        float var13;
+        double var13;
         int var15;
         if(var6) {
             for(var11 = var8; var11 < var3; ++var11) {
@@ -217,8 +218,8 @@ public class SingularValueDecomposition implements Serializable {
 
         var11 = var10 - 1;
         var49 = 0;
-        var13 = (float)Math.pow(2, -52);
-        float var50 = (float)Math.pow(2, -966);
+        var13 = (double)Math.pow(2, -52);
+        double var50 = (double)Math.pow(2, -966);
 
         while(true) {
             label349:
@@ -237,7 +238,7 @@ public class SingularValueDecomposition implements Serializable {
                     var18 = 4;
                 } else {
                     for(var19 = var10 - 1; var19 >= var17 && var19 != var17; --var19) {
-                        float var20 = (var19 != var10?Math.abs(var4[var19]):0) + (var19 != var17 + 1?Math.abs(var4[var19 - 1]):0);
+                        double var20 = (var19 != var10?Math.abs(var4[var19]):0) + (var19 != var17 + 1?Math.abs(var4[var19 - 1]):0);
                         if(Math.abs(this.s[var19]) <= var50 + var13 * var20) {
                             this.s[var19] = 0;
                             break;
@@ -256,11 +257,11 @@ public class SingularValueDecomposition implements Serializable {
 
                 ++var17;
                 int var21;
-                float var22;
-                float var24;
-                float var26;
+                double var22;
+                double var24;
+                double var26;
                 int var28;
-                float var51;
+                double var51;
                 switch(var18) {
                     case 1:
                         var51 = var4[var10 - 2];
@@ -314,16 +315,16 @@ public class SingularValueDecomposition implements Serializable {
                         }
                     case 3:
                         var51 = Math.max(Math.max(Math.max(Math.max(Math.abs(this.s[var10 - 1]), Math.abs(this.s[var10 - 2])), Math.abs(var4[var10 - 2])), Math.abs(this.s[var17])), Math.abs(var4[var17]));
-                        float var52 = this.s[var10 - 1] / var51;
-                        float var23 = this.s[var10 - 2] / var51;
-                        float var25 = var4[var10 - 2] / var51;
-                        float var27 = this.s[var17] / var51;
-                        float var29 = var4[var17] / var51;
-                        float var31 = ((var23 + var52) * (var23 - var52) + var25 * var25) / 2;
-                        float var33 = var52 * var25 * var52 * var25;
-                        float var35 = 0;
+                        double var52 = this.s[var10 - 1] / var51;
+                        double var23 = this.s[var10 - 2] / var51;
+                        double var25 = var4[var10 - 2] / var51;
+                        double var27 = this.s[var17] / var51;
+                        double var29 = var4[var17] / var51;
+                        double var31 = ((var23 + var52) * (var23 - var52) + var25 * var25) / 2;
+                        double var33 = var52 * var25 * var52 * var25;
+                        double var35 = 0;
                         if(var31 != 0 | var33 != 0) {
-                            var35 = (float)Math.sqrt(var31 * var31 + var33);
+                            var35 = (double)Math.sqrt(var31 * var31 + var33);
                             if(var31 < 0) {
                                 var35 = -var35;
                             }
@@ -331,13 +332,13 @@ public class SingularValueDecomposition implements Serializable {
                             var35 = var33 / (var31 + var35);
                         }
 
-                        float var37 = (var27 + var52) * (var27 - var52) + var35;
-                        float var39 = var27 * var29;
+                        double var37 = (var27 + var52) * (var27 - var52) + var35;
+                        double var39 = var27 * var29;
 
                         for(int var41 = var17; var41 < var10 - 1; ++var41) {
-                            float var42 = JTool.hypot(var37, var39);
-                            float var44 = var37 / var42;
-                            float var46 = var39 / var42;
+                            double var42 = JTool.hypot(var37, var39);
+                            double var44 = var37 / var42;
+                            double var46 = var39 / var42;
                             if(var41 != var17) {
                                 var4[var41 - 1] = var42;
                             }
@@ -415,12 +416,12 @@ public class SingularValueDecomposition implements Serializable {
         }
     }
 
-    public float[][] getU() {
+    public double[][] getU() {
         return U;
     }
 
-    public float[][] getU(int var1){
-        float[][] U1 = new float[this.m][var1];
+    public double[][] getU(int var1){
+        double[][] U1 = new double[this.m][var1];
         for (int i = 0; i < this.m; i++) {
             for (int j = 0; j < var1; j++) {
                 U1[i][j] = U[i][j];
@@ -429,12 +430,12 @@ public class SingularValueDecomposition implements Serializable {
         return U1;
     }
 
-    public float[][] getV() {
+    public double[][] getV() {
         return V;
     }
 
-    public float[][] getV(int var1){
-        float[][] V1 = new float[this.n][var1];
+    public double[][] getV(int var1){
+        double[][] V1 = new double[this.n][var1];
         for (int i = 0; i < this.n; i++) {
             for (int j = 0; j < var1; j++) {
                 V1[i][j] = V[i][j];
@@ -443,13 +444,13 @@ public class SingularValueDecomposition implements Serializable {
         return V1;
     }
 
-    public float[] getSingularValues() {
+    public double[] getSingularValues() {
         return this.s;
     }
 
-    public float[][] getS() {
+    public double[][] getS() {
         //Matrix var1 = new Matrix(this.n, this.n);
-        float[][] var2 = new float[this.n][this.n];
+        double[][] var2 = new double[this.n][this.n];
 
         for(int var3 = 0; var3 < this.n; ++var3) {
             for(int var4 = 0; var4 < this.n; ++var4) {
@@ -462,9 +463,9 @@ public class SingularValueDecomposition implements Serializable {
         return var2;
     }
 
-    public float[][] getS(int var1) {
+    public double[][] getS(int var1) {
         //Matrix var1 = new Matrix(this.n, this.n);
-        float[][] var2 = new float[var1][var1];
+        double[][] var2 = new double[var1][var1];
 
         for(int var3 = 0; var3 < var1; ++var3) {
             for(int var4 = 0; var4 < var1; ++var4) {
@@ -477,17 +478,17 @@ public class SingularValueDecomposition implements Serializable {
         return var2;
     }
 
-    public float norm2() {
+    public double norm2() {
         return this.s[0];
     }
 
-    public float con() {
+    public double con() {
         return this.s[0] / this.s[Math.min(this.m, this.n) - 1];
     }
 
     public int rank() {
-        float var1 = (float)Math.pow(2, -52);
-        float var3 = (float)Math.max(this.m, this.n) * this.s[0] * var1;
+        double var1 = (double)Math.pow(2, -52);
+        double var3 = (double)Math.max(this.m, this.n) * this.s[0] * var1;
         int var5 = 0;
 
         for(int var6 = 0; var6 < this.s.length; ++var6) {
