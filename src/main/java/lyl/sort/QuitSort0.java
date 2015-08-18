@@ -3,13 +3,16 @@ package lyl.sort;
 /**
  * Created by lyl on 2015/8/16.
  */
-public class QuitSort {
+/**
+ * 备用
+ */
+public class QuitSort0 {
     private static double Pmin = 0.5;
     private static double Pmax = 0.8;
     private int min;
     private int max;
-    public int Min_partiion(double[] input,int low,int high){
-        double a = input[low];
+    public int Min_partiion(int[] input,int low,int high){
+        int a = input[low];
 
         while(low < high){
             while(low<high && input[high] >=a) high--;
@@ -21,8 +24,8 @@ public class QuitSort {
         return low;
     }
 
-    public int Top_partiion(double[] input,int low,int high){
-        double a = input[low];
+    public int Top_partiion(int[] input,int low,int high){
+        int a = input[low];
 
         while(low < high){
             while(low<high && input[high]<= a) high--;
@@ -34,7 +37,7 @@ public class QuitSort {
         return low;
     }
 
-    public double TopK(double[] input ,int high){
+    public int TopK(int[] input ,int high){
         int start =0;
         int end = input.length-1;
         int index = Top_partiion(input, start, end);
@@ -49,7 +52,7 @@ public class QuitSort {
         }
         return  input[high];
     }
-    public double MinK(double[] input,int low){
+    public int MinK(int[] input,int low){
         int start =0;
         int end = input.length-1;
         int index = Min_partiion(input, start, end);
@@ -74,6 +77,28 @@ public class QuitSort {
         return max;
     }
 
+    public  void MaxMin(int[] input){
+        int len = input.length;
+        int high =len - (int) (len *Pmax);
 
+        max = TopK(input,high);
+
+        int low = (int) (len *Pmin);
+        min = MinK(input,low-1);
+    }
+    public static void main(String[] args){
+        int[] input={20,34,4,142,124,12};
+
+
+        QuitSort0 quitSort = new QuitSort0();
+        long t1 =System.currentTimeMillis();
+        quitSort.MaxMin(input);
+
+
+        long t2 = System.currentTimeMillis();
+        System.out.println(t2-t1);
+        System.out.println(quitSort.getMax());
+        System.out.println(quitSort.getMin());
+    }
 
 }

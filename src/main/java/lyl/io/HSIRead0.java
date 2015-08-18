@@ -9,38 +9,51 @@ import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
-public class HSIRead {
-	
+/**
+ * 备用
+ */
+public class HSIRead0 {
+
 	private  String filename=null;
 	private File file;
 	private HSIHEADER hsiheader;
-	private double [][] data;
-	public HSIRead(String filename) throws IOException{
+	private short[][] sdata;
+	private int[][] idata;
+	private float[][] fdata;
+	public HSIRead0(String filename) throws IOException{
 		this.filename=filename;
-	
+
 		String[] t=this.filename.split("\\.");
-		
+
 
 		file=new File(t[0]+".hdr");
-		
+
 		if(!file.exists()){
 			System.out.println("图像文件没有头文件....");
 			System.exit(0);
 		}
-		
+
 		hsiheader =new HSIHEADER();
 		hsiheader.ReadHead(file);
-		
+
 		file=new File(this.filename);
 	}
 
-	
+
 	public int getDataType(){
 		return hsiheader.getDataType();
 	}
 
-	public double[][] getData() {
-		return data;
+	public short[][] getSdata() {
+		return sdata;
+	}
+
+	public int[][] getIdata() {
+		return idata;
+	}
+
+	public float[][] getFdata() {
+		return fdata;
 	}
 
 	public void Read(){
@@ -117,10 +130,10 @@ public class HSIRead {
 			 ***********************/
 			switch (hsiheader.getDataType()){
 				case 2:
-					data=new double[PixelSize][nBand];
+					sdata=new short[PixelSize][nBand];
 					for(int i =0;i<nBand;i++)
 						for(int j =0,k=0;j<PixelSize;j++,k=k+dataSize){
-							data[j][i]=(short)((imgbuffer.get()&0xff)|(imgbuffer.get()<<8));
+							sdata[j][i]=(short)((imgbuffer.get()&0xff)|(imgbuffer.get()<<8));
 						}
 					break;
 				default:
@@ -153,10 +166,10 @@ public class HSIRead {
 			 ***********************/
 			switch (hsiheader.getDataType()){
 				case 2:
-					data=new double[nBand][PixelSize];
+					sdata=new short[nBand][PixelSize];
 					for(int i =0;i<nBand;i++)
 						for(int j =0,k=0;j<PixelSize;j++,k=k+dataSize){
-							data[i][j]=(short)((imgbuffer.get()&0xff)|(imgbuffer.get()<<8));
+							sdata[i][j]=(short)((imgbuffer.get()&0xff)|(imgbuffer.get()<<8));
 						}
 					break;
 				default:
@@ -191,34 +204,34 @@ public class HSIRead {
 		
 			switch (hsiheader.getDataType()){
 				case 2:
-					data=new double[PixelSize][bands];
+					sdata=new short[PixelSize][bands];
 					for(int i =0;i<rows;i++){
 						int p=i*cols;
 						for(int j=0;j<bands;j++)
 							for(int k=0;k<cols;k++){
-								data[p+k][j]=(short)((imgbuffer.get()&0xff)|(imgbuffer.get()<<8));
+								sdata[p+k][j]=(short)((imgbuffer.get()&0xff)|(imgbuffer.get()<<8));
 						}
 					}
 					break;
 				case 4:
-					data=new double[PixelSize][bands];
+					fdata=new float[PixelSize][bands];
 							for(int i =0;i<rows;i++){
 								int p=i*cols;
 								for(int j=0;j<bands;j++)
 									for(int k=0;k<cols;k++){
 										int t=(int)((imgbuffer.get()&0xff)|(imgbuffer.get()<<8)&0xffff
 												|(imgbuffer.get()<<16)&0xffffff | (imgbuffer.get()<<24));
-										data[p+k][j]=Float.intBitsToFloat(t);
+										fdata[p+k][j]=Float.intBitsToFloat(t);
 									}
 							}
 					break;
 				case 12:
-					data=new double[PixelSize][bands];
+					idata=new int[PixelSize][bands];
 							for(int i =0;i<rows;i++){
 								int p=i*cols;
 								for(int j=0;j<bands;j++)
 									for(int k=0;k<cols;k++){
-										data[p+k][j]=(int)((imgbuffer.get()&0xff)|(imgbuffer.get()<<8)&0xffff);
+										idata[p+k][j]=(int)((imgbuffer.get()&0xff)|(imgbuffer.get()<<8)&0xffff);
 								}
 							}
 					break;
@@ -254,36 +267,36 @@ public class HSIRead {
 
 			switch (hsiheader.getDataType()){
 				case 2:
-					data=new double[PixelSize][bands];
+					sdata=new short[PixelSize][bands];
 					//		byte[] temp=new byte[(int) file.length()];
 					//	imgbuffer.get(temp);
 					//		int n=0;
 					for(int i =0;i<PixelSize;i++){
 						for(int j=0;j<bands;j++) {
 								//		sdata[p+k][j]=(short)((temp[n++]&0xff)|(temp[n++]<<8));
-								data[i][j]=(short)((imgbuffer.get()&0xff)|(imgbuffer.get()<<8));
+								sdata[i][j]=(short)((imgbuffer.get()&0xff)|(imgbuffer.get()<<8));
 							}
 					}
 					break;
 				case 4:
-					data=new double[PixelSize][bands];
+					fdata=new float[PixelSize][bands];
 					for(int i =0;i<rows;i++){
 						int p=i*cols;
 						for(int j=0;j<bands;j++)
 							for(int k=0;k<cols;k++){
 								int t=(int)((imgbuffer.get()&0xff)|(imgbuffer.get()<<8)&0xffff
 										|(imgbuffer.get()<<16)&0xffffff | (imgbuffer.get()<<24));
-								data[p+k][j]=Float.intBitsToFloat(t);
+								fdata[p+k][j]=Float.intBitsToFloat(t);
 							}
 					}
 					break;
 				case 12:
-					data=new double[PixelSize][bands];
+					idata=new int[PixelSize][bands];
 					for(int i =0;i<rows;i++){
 						int p=i*cols;
 						for(int j=0;j<bands;j++)
 							for(int k=0;k<cols;k++){
-								data[p+k][j]=(int)((imgbuffer.get()&0xff)|(imgbuffer.get()<<8)&0xffff);
+								idata[p+k][j]=(int)((imgbuffer.get()&0xff)|(imgbuffer.get()<<8)&0xffff);
 							}
 					}
 					break;

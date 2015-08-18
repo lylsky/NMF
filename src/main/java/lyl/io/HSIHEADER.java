@@ -1,10 +1,6 @@
 package lyl.io;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 /********************************
  * @author lyl
@@ -53,43 +49,53 @@ public class HSIHEADER {
 		this.byteOrder = -1;
 	}
 
-	public int get_samples(){
-		return this.samples;
-	}
-	public void set_samples(int a){
-		this.samples= a;
-	}
-	public int get_lines(){
-		return this.lines;
-	}
-	public void set_liens(int a){
-		this.lines =a;
-	}
-	public int get_bands(){
-		return this.bands;
-	}
-	public void set_bands(int a){
-		this.bands = a;
-	}
-	public int get_byteOrder(){
-		return this.byteOrder;
-	}
-	public void set_byteOrder(int a){
-		this.byteOrder =a;
-	}
-	public int get_dataType(){
-		return this.dataType;
-	}
-	public void set_dataType(int a){
-		this.dataType =a;
-	}
-	public String get_interleave(){
-		return this.interleave;
-	}
-	public void set_interleave(String a){
-		this.interleave =a;
+	public int getSamples() {
+		return samples;
 	}
 
+	public void setSamples(int samples) {
+		this.samples = samples;
+	}
+
+	public int getLines() {
+		return lines;
+	}
+
+	public void setLines(int lines) {
+		this.lines = lines;
+	}
+
+	public int getBands() {
+		return bands;
+	}
+
+	public void setBands(int bands) {
+		this.bands = bands;
+	}
+
+	public int getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(int dataType) {
+		this.dataType = dataType;
+	}
+
+	public String getInterleave() {
+		return interleave;
+	}
+
+	public void setInterleave(String interleave) {
+		this.interleave = interleave;
+	}
+
+	public int getByteOrder() {
+		return byteOrder;
+	}
+
+	public void setByteOrder(int byteOrder) {
+		this.byteOrder = byteOrder;
+	}
 
 	public void ReadHead(File file) throws IOException{
 		BufferedReader reader =null;
@@ -103,27 +109,27 @@ public class HSIHEADER {
 					strRight = strLine.substring(pos+1,strLine.length()).trim();
 
 					if(strLeft.equals("samples")){
-						set_samples(Integer.parseInt(strRight));
+						setSamples(Integer.parseInt(strRight));
 						continue;
 					}
 					if(strLeft.equals("lines")){
-						set_liens(Integer.parseInt(strRight));
+						setLines(Integer.parseInt(strRight));
 						continue;
 					}
 					if(strLeft.equals("bands")){
-						set_bands(Integer.parseInt(strRight));
+						setBands(Integer.parseInt(strRight));
 						continue;
 					}
 					if(strLeft.equals("interleave")){
-						set_interleave(strRight);
+						setInterleave(strRight);
 						continue;
 					}
 					if(strLeft.equals("data type")){
-						set_dataType(Integer.parseInt(strRight));
+						setDataType(Integer.parseInt(strRight));
 						continue;
 					}
 					if(strLeft.equals("byte order")){
-						set_byteOrder(Integer.parseInt(strRight));
+						setByteOrder(Integer.parseInt(strRight));
 						continue;
 					}
 					if (strLeft == "map info")

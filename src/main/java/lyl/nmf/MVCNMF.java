@@ -1,113 +1,86 @@
 package lyl.nmf;
 
-//import Jama.Matrix;
-//import SVD.SingularValueDecomposition;
+/**
+ * Created by lyl on 2015/8/18.
+ */
+
 import lyl.Matrix.Matrix;
-import lyl.io.HSIRead;
-import lyl.io.HSIhdr;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-
+import lyl.context.NMFContext;
+import lyl.sort.QuitSort;
 
 /**
- * Created by lyl on 2015/8/15.
+ * NMF的实际运算
  */
-public class NMF1 {
-    private int J = 5;
-    private int NN = 1;
-    private int cols;
-    private int rows;
-    private int bands;
-    private int datatype;
-
-    private double lmax;
+public class MVCNMF {
     private double lmin;
-//    private int inter;
+    private double lmax;
 
+    double muA = 3;
+    double muS = 3;
+    double tauA = (double)0.005;
+    double stu = 2;
+    double tol = (double) 1e-4;
+    int maxiter = 500;
+    double lambdaA = 5;
 
-//    private Matrix A = null;
-//    private Matrix S = null;
-
-    Matrix A = null;
+    private NMFContext context = NMFContext.getContext();
+    Matrix A =null;
     Matrix S = null;
-    Matrix X = null;
+    Matrix X = NMFContext.getContext().getX();
 
-
-
-
-    public NMF1(String filename) throws IOException {
-        HSIhdr hsi = new HSIhdr(filename, "");
-        cols = hsi.getSamples();
-        rows = hsi.getLines();
-        bands = hsi.getBands();
-        datatype = hsi.getDatatype();
-        HSIRead hr = new HSIRead(filename);
-        hr.read();
-        X = new Matrix(Mat.FtoD(hr.getData()));
-
-        A = new Matrix(J, bands);
-        S = new Matrix(cols * rows * NN,J);
-//        A = new Matrix(bands, J);
-//        S = new Matrix(J, cols * rows * NN);
-    }
-
-    public void initAS() throws IOException {
-
-        //A B*J
-        BufferedReader br = new BufferedReader(new FileReader("InitA.txt"));
-        double[][] v_A = A.getArray();
-        for (int i = 0; i < J; i++) {
-            for (int j = 0; j < bands; j++) {
-                v_A[i][j] = Double.parseDouble(br.readLine());
+    private void dataFilter(){
+        double[][] array = X.getArray();
+        int len = array.length;
+        int band = array[0].length;
+        for (int i = 0; i < len; i++) {
+            for (int j = 0; j < band; j++) {
+                if(array[i][j] <lmin) array[i][j]=lmin;
+                if(array[i][j] >lmax) array[i][j]=lmax;
             }
         }
-        //S J*P
-        br = new BufferedReader(new FileReader("InitS.txt"));
-        double[][] v_S = S.getArray();
-        for (int i = 0; i < J; i++) {
-            for (int j = 0; j < rows * cols; j++) {
-                v_S[j][i] = Double.parseDouble(br.readLine());
-                for (int k = 1; k < NN; k++) {
-                    v_S[rows * cols * k + j][i] = v_S[j][i];
-                }
-            }
-        }
-
-        br.close();
+        X.minus(lmin);
+        X.div(lmax);
     }
 
-    public void linearMax(double[][] X, double lmin, double lmax) {
-        int rows = X.length;
-        int cols = X[0].length;
-        int length = rows * cols;
-        //Math.
+    public void In_S(Matrix eVptX, Matrix eVptA, Matrix s, Matrix d_S){
+        int J = eVptA.getRowDimension();
+        S = (eVptX.times(eVptA.T()).plus(s.plus(d_S).times(muS))).times((eVptA.times(eVptA.T()).plus(new Matrix(J, muS))).inverse());
+        s = S.minus(d_S).maxM(0);
+        d_S = d_S.minus(S.minus(s));
     }
 
-    public void In_PCA(double[][] U, double[][] X, int k){
-
+    public void In_A(Matrix X, Matrix S, Matrix a, Matrix d_A, Matrix A0, Matrix g){
+        int J = S.getColumnDimension();
+        Matrix F, b;
+        F = (S.times(S.T()).plus(new Matrix(J, lambdaA*tauA+muA))).inverse();
+        b = S.T().times(X);
+        A = F.times((a.plus(d_A)).times(muA).plus(b).plus(A0.times(lambdaA * tauA)).minus(g.times(lambdaA)));
+        a = A.minus(d_A).maxM(0);
+        d_A = d_A.minus(A.minus(a));
     }
 
-    public void In_S(Matrix eVptX, Matrix eVptA, Matrix s, Matrix d_S, double muS){
-        int J = A.getRowDimension();
+    public void linearMax() {
+        double Pmax = 0.9999;
+        double Pmin = 0.00001;
+        double[] data = X.getColumnPackedCopy();
+        int len = data.length;
+
+        QuitSort qs = new QuitSort();
+
+        int high =len - (int) (len *Pmax);
+        lmax = qs.TopK(data, high);
+
+        int low = (int) (len *Pmin);
+        lmin = qs.MinK(data, low - 1);
     }
 
-    public void In_A(){
-
-    }
-
-    public void MVCMNF() {
-        double muA = 3;
-        double muS = 3;
-        double tauA = (double)0.005;
-        double stu = 2;
-        double tol = (double) 1e-4;
-        int maxiter = 500;
-        double lambdaA = 5;
-
+    public void NMFiteror(){
         int P = X.getRowDimension();
         int B = X.getColumnDimension();
+
+        int J = context.getJ();
+        A = context.getA();
+        S = context.getS();
 
         Matrix Up; //double[P][J];
         Matrix D; //double[J][J];
@@ -144,10 +117,10 @@ public class NMF1 {
             SSUM.setCol(Ssum, i);
         }
 
-        Matrix s; //= new double[P][J];
-        Matrix d_S; //= new double[P][J];
-        Matrix a; // = new double[J][B];
-        Matrix d_A; // = new double[J][B];
+        Matrix s= new Matrix(P,J); //= new double[P][J];
+        Matrix d_S= new Matrix(P,J); //= new double[P][J];
+        Matrix a = new Matrix(J,B); // = new double[J][B];
+        Matrix d_A = new Matrix(J,B); // = new double[J][B];
         Matrix oldS, oldA, BUt;
         Matrix U = new Matrix(J - 1, P); // = new double[J - 1][P];
         Matrix C = new Matrix(J, J); // = new double[J][J];
@@ -179,17 +152,17 @@ public class NMF1 {
                 double f, f_val, f_quad;
                 eA = A.addCol(stu);
                 f0 = 0.5 * (eX2 - 2 * eX.times(eA.T()).arrayTimes(S).sum()
-                            + eA.times(eA.T()).arrayTimes(S.T().times(S)).sum());
+                        + eA.times(eA.T()).arrayTimes(S.T().times(S)).sum());
                 Z = C.minus(A.minus(uOnet).times(BUt));
                 f0_val = f0 + lambdaA * Math.log(Math.abs(Z.det()));
                 f0_quad = f0 + lambdaA * (g.arrayTimes(A.minus(A0)).sum())
-                            +0.5 * tauA * A.minus(A0).arrayTimes(A.minus(A0)).sum();
+                        +0.5 * tauA * A.minus(A0).arrayTimes(A.minus(A0)).sum();
 
                 for (int inner = 0; inner < 10; inner++) {
                     Matrix eVptA;
                     eVptA = Vp.T().times(A).addCol(stu);
-                    //In_S(eVptA, eVptA, S, s, d_S, muS);
-                    //In_A(XUp, A, S*Up, a, d_A, muA, A0, g, lambdaA, tauA);
+                    In_S(eVptA, eVptA, s, d_S);
+                    In_A(XVp, Vp.times(S), a, d_A, A0, g);
                 }
                 eA = A.addCol(stu);
                 f = 0.5 * (eX2 - 2 * eX.times(eA.T()).arrayTimes(S).sum()
@@ -216,9 +189,9 @@ public class NMF1 {
             }
 
             double dtol_S = Math.sqrt(oldS.minus(S).arrayTimes(oldS.minus(S)).sum())
-                            / oldS.arrayTimes(oldS).sum();
+                    / oldS.arrayTimes(oldS).sum();
             double dtol_A = Math.sqrt(oldA.minus(A).arrayTimes(oldA.minus(A)).sum())
-                            / oldA.arrayTimes(oldA).sum();
+                    / oldA.arrayTimes(oldA).sum();
 
             if (dtol_S < tol && dtol_A < tol){
                 break;
@@ -234,11 +207,8 @@ public class NMF1 {
         System.out.println("iter = " + iter);
         S = S.maxM(0);
         A = A.maxM(0);
-
     }
 
-    public static void main(String[] args){
-        System.out.print("dddd");
 
-    }
+
 }

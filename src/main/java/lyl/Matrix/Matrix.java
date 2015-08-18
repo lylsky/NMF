@@ -5,7 +5,6 @@ package lyl.Matrix;
  */
 
 public class Matrix extends Jama.Matrix {
-//    private double[][] array;
     public Matrix(int var1, int var2){
         super(var1, var2);
     }
@@ -26,11 +25,22 @@ public class Matrix extends Jama.Matrix {
         super(var1, var2);
     }
 
-    public Matrix times(Jama.Matrix matrix) {
-        return (Matrix)super.times(matrix);
+    public Matrix(int var1, double val){
+        super(var1, var1);
+        double[][] var2 = this.getArray();
+        for (int i = 0; i < var1; i++) {
+            var2[i][i] = val;
+        }
     }
 
-    public Matrix arrayTimes(Jama.Matrix matrix) {
+    public Matrix times(Matrix matrix) {
+        return (Matrix)super.times(matrix);
+    }
+    public Matrix times(double val) {
+        return (Matrix)super.times(val);
+    }
+
+    public Matrix arrayTimes(Matrix matrix) {
         return (Matrix)super.arrayTimes(matrix);
     }
 
@@ -38,11 +48,11 @@ public class Matrix extends Jama.Matrix {
         return (Matrix)super.transpose();
     }
 
-    public Matrix plus(Matrix matrix) {
+    public Matrix plus(Jama.Matrix matrix) {
         return (Matrix)super.plus(matrix);
     }
 
-    public Matrix minus(Matrix matrix) {
+    public Matrix minus(Jama.Matrix matrix) {
         return (Matrix)super.minus(matrix);
     }
 
@@ -59,7 +69,15 @@ public class Matrix extends Jama.Matrix {
         }
         return this;
     }
-
+    public Matrix minus(double var1) {
+        double[][] var2 = this.getArray();
+        for (int i = 0; i < var2.length; i++) {
+            for (int j = 0; j < var2[0].length; j++) {
+                var2[i][j] -= var1;
+            }
+        }
+        return this;
+    }
     public Matrix addCol(double val){
         int m = this.getRowDimension();
         int n = this.getColumnDimension();
@@ -202,5 +220,6 @@ public class Matrix extends Jama.Matrix {
         }
         return arr;
     }
+
 
 }
