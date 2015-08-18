@@ -2,7 +2,8 @@ package lyl.nmf;
 
 import Jama.Matrix;
 import SVD.SingularValueDecomposition;
-import org.apache.commons.math3.*;
+import lyl.io.HSIRead;
+import lyl.io.HSIhdr;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

@@ -4,6 +4,8 @@ import Jama.Matrix;
 import SVD.JTool;
 //import SVD.SingularValueDecomposition;
 import  Jama.SingularValueDecomposition;
+import lyl.io.HSIRead;
+
 import java.io.*;
 /**
  * Created by jingle on 2015/8/16.
