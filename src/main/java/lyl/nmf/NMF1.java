@@ -24,6 +24,13 @@ public class NMF1 {
 
     private double lmax;
     private double lmin;
+
+    double muA = 3;
+    double muS = 3;
+    double tauA = (double)0.005;
+    double stu = 2;
+    double tol = (double) 1e-4;
+    double lambdaA = 5;
 //    private int inter;
 
 
@@ -89,22 +96,25 @@ public class NMF1 {
 
     }
 
-    public void In_S(Matrix eVptX, Matrix eVptA, Matrix s, Matrix d_S, double muS){
-        int J = A.getRowDimension();
+    public void In_S(Matrix eVptX, Matrix eVptA, Matrix s, Matrix d_S){
+        int J = eVptA.getRowDimension();
+        S = (eVptX.times(eVptA.T()).plus(s.plus(d_S).times(muS))).times((eVptA.times(eVptA.T()).plus(new Matrix(J, muS))).inverse());
+        s = S.minus(d_S).maxM(0);
+        d_S = d_S.minus(S.minus(s));
     }
 
-    public void In_A(){
-
+    public void In_A(Matrix X, Matrix S, Matrix a, Matrix d_A, Matrix A0, Matrix g){
+        int J = S.getColumnDimension();
+        Matrix F, b;
+        F = (S.times(S.T()).plus(new Matrix(J, lambdaA*tauA+muA))).inverse();
+        b = S.T().times(X);
+        A = F.times((a.plus(d_A)).times(muA).plus(b).plus(A0.times(lambdaA * tauA)).minus(g.times(lambdaA)));
+        a = A.minus(d_A).maxM(0);
+        d_A = d_A.minus(A.minus(a));
     }
 
     public void MVCMNF() {
-        double muA = 3;
-        double muS = 3;
-        double tauA = (double)0.005;
-        double stu = 2;
-        double tol = (double) 1e-4;
         int maxiter = 500;
-        double lambdaA = 5;
 
         int P = X.getRowDimension();
         int B = X.getColumnDimension();
