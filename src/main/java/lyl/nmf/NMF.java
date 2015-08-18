@@ -20,17 +20,17 @@ public class NMF {
     private int bands;
     private int datatype;
 
-    private float lmax;
-    private float lmin;
+    private double lmax;
+    private double lmin;
 //    private int inter;
 
 
 //    private Matrix A = null;
 //    private Matrix S = null;
 
-    private float[][] A = null;
-    private float[][] S = null;
-    private float[][] X = null;
+    private double[][] A = null;
+    private double[][] S = null;
+    private double[][] X = null;
 
 
 
@@ -43,28 +43,30 @@ public class NMF {
         datatype = hsi.getDatatype();
         HSIRead hr = new HSIRead(filename);
         hr.read();
-        X = hr.getData();
+        X = Mat.FtoD(hr.getData());
 
-        A = new float[bands][J];
-        S = new float[J][cols * rows * NN];
+        A = new double[J][bands];
+        S = new double[cols * rows * NN][J];
 //        A = new Matrix(bands, J);
 //        S = new Matrix(J, cols * rows * NN);
     }
 
     public void initAS() throws IOException {
+
+        //A B*J
         BufferedReader br = new BufferedReader(new FileReader("InitA.txt"));
         for (int i = 0; i < J; i++) {
             for (int j = 0; j < bands; j++) {
-                A[j][i] = Float.parseFloat(br.readLine());
+                A[i][j] = Double.parseDouble(br.readLine());
             }
         }
-
+        //S J*P
         br = new BufferedReader(new FileReader("InitS.txt"));
         for (int i = 0; i < J; i++) {
             for (int j = 0; j < rows * cols; j++) {
-                S[i][j] = Float.parseFloat(br.readLine());
+                S[j][i] = Double.parseDouble(br.readLine());
                 for (int k = 1; k < NN; k++) {
-                    S[i][rows * cols * k + j] = S[i][j];
+                    S[rows * cols * k + j][i] = S[j][i];
                 }
             }
         }
@@ -72,50 +74,101 @@ public class NMF {
         br.close();
     }
 
-    public void linearMax(float[][] X, float lmin, float lmax) {
+    public void linearMax(double[][] X, double lmin, double lmax) {
         int rows = X.length;
         int cols = X[0].length;
         int length = rows * cols;
         //Math.
     }
 
+    public void In_PCA(double[][] U, double[][] X, int k){
+
+    }
+
     public void MVCMNF() {
-        float muA = 3;
-        float muS = 3;
-        float tauA = (float)0.005;
-        float stu = 2;
-        float tol = (float) 1e-4;
+        double muA = 3;
+        double muS = 3;
+        double tauA = (double)0.005;
+        double stu = 2;
+        double tol = (double) 1e-4;
         int maxiter = 500;
-        float lambdaA = 5;
+        double lambdaA = 5;
 
         int P = X.length;
         int B = X[0].length;
 
-        float[][] Up = new float[P][J];
-        float[][] D = new float[J][J];
-        float[][] Vp = new float[B][J];
-        float[][] XVp = new float[P][J];
-        float[][] UptX = new float[J][B];
-        float[][] eXVp = new float[P][J + 1];
-        float[][] eX = new float[P][B + 1];
-        float[][] SSUM = new float[P][J];
+        double[][] Up; //double[P][J];
+        double[][] D; //double[J][J];
+        double[][] Vp; //double[B][J];
+        double[][] XVp; //double[P][J];
+        double[][] UptX; //double[J][B];
+        double[][] eXVp; //double[P][J + 1];
+        double[][] eX; //double[P][B + 1];
+        double[][] SSUM = new double[P][J];
 
-        float[] Ssum;
-        float eX2, Xscale, Rscale, sqrnorm;
-//
-//        SingularValueDecomposition svd = new SingularValueDecomposition(X);
-//        Up = svd.getU();
-//        Vp = svd.getV();
-//        D = svd.getS();
-//        XVp = Mat.mult(Up, D);
-//        UptX = Mat.multTr(D, Vp);
-//        eXVp = Mat.addCol(XVp, stu);
-//        eX = Mat.addCol(X, stu);
-//
-//        eX2 = Mat.sum(Mat.elemMult(eX, eX));
-//        Xscale = Mat.sum(X);
-//        Rscale = Mat.sum(Mat.mult(A, S));
-//        sqrnorm = (float)Math.sqrt(Rscale / Xscale);
+        double[] Ssum;
+        double eX2, Xscale, Rscale, sqrnorm;
+
+        SingularValueDecomposition svd = new SingularValueDecomposition(X, 1);
+        Up = svd.getU();
+        Vp = svd.getV();
+        D = svd.getS();
+        XVp = Mat.mult(Up, D);
+        UptX = Mat.multTr(D, Vp);
+        eXVp = Mat.addCol(XVp, stu);
+        eX = Mat.addCol(X, stu);
+
+        eX2 = Mat.sum(Mat.elemMult(eX, eX));
+        Xscale = Mat.sum(X);
+        Rscale = Mat.sum(Mat.mult(A, S));
+        sqrnorm = (double)Math.sqrt(Rscale / Xscale);
+        A = Mat.div(A, sqrnorm);
+        S = Mat.div(S, sqrnorm);
+        Ssum = Mat.sum1(S, 0);
+        for (int i = 0; i < J; i++) {
+            Mat.setCol(SSUM, Ssum, i);
+        }
+
+        double[][] s = new double[P][J];
+        double[][] d_S = new double[P][J];
+        double[][] a = new double[J][B];
+        double[][] d_A = new double[J][B];
+        double[][] oldS, oldA, BUt;
+        double[][] U = new double[J - 1][P];
+        double[][] C = new double[J][J];
+        double[][] B_ = new double[J - 1][J];
+        double[][] uOnet = new double[J][B];
+        double[] u;
+
+        oldS = S;
+        oldA = A;
+        In_PCA(U, X, J - 1);
+        u = Mat.mean(X, 1);
+        Mat.setCol(C, 1D, 0);
+        for (int i = 0; i < J - 1; i++) {
+            B_[i][i + 1] = 1;
+        }
+        BUt = Mat.trMult(U, B_); //P*J
+        for (int i = 0; i < J; i++) {
+            Mat.setRow(uOnet, u, i);
+        }
+
+        for (int iter = 0; iter < maxiter; iter++) {
+            double[][] Z, g, A0;
+            Z = Mat.sub(C, Mat.mult(Mat.sub(A, uOnet), BUt));
+            g = new Matrix(Z).inverse().times(new Matrix(BUt).transpose()).getArray();
+            A0 = A;
+
+            for (int loop = 0; loop < 50; loop++) {
+                double[][] eA;
+                double f0, f0_val, f0_quad;
+                double f, f_val, f_quad;
+                eA = Mat.addCol(A, stu);
+//                f0 = 0.5 *
+            }
+
+        }
+
 
 
 
