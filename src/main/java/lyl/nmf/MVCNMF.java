@@ -7,6 +7,8 @@ package lyl.nmf;
 import lyl.Matrix.Matrix;
 import lyl.context.NMFContext;
 import lyl.sort.QuitSort;
+import org.jblas.DoubleMatrix;
+import org.jblas.Singular;
 
 /**
  * NMF的实际运算
@@ -27,6 +29,7 @@ public class MVCNMF {
     Matrix A =null;
     Matrix S = null;
     Matrix X = NMFContext.getContext().getX();
+    int J = context.getJ();
 
     private void dataFilter(){
         double[][] array = X.getArray();
@@ -74,11 +77,28 @@ public class MVCNMF {
         lmin = qs.MinK(data, low - 1);
     }
 
+    public void In_PCA(Matrix U,Matrix X){
+        int N = U.getRowDimension();
+        double[] mx;
+        Matrix mXX = new Matrix(X.getColumnDimension(),X.getRowDimension());
+        mx = X.mean(1);
+        for (int i = 0; i < N; i++) {
+            mXX.setCol(mx,i);
+        }
+        mXX = X.minus(mXX);
+        mXX = mXX.times(mXX.T()).div(N);
+        DoubleMatrix matrix = new DoubleMatrix(mXX.getArray());
+        DoubleMatrix[] s = Singular.fullSVD(matrix);
+        U = new Matrix(s[0].data,s[0].getColumns());
+        int k  =J-1;
+
+    }
+
     public void NMFiteror(){
         int P = X.getRowDimension();
         int B = X.getColumnDimension();
 
-        int J = context.getJ();
+
         A = context.getA();
         S = context.getS();
 
@@ -130,7 +150,7 @@ public class MVCNMF {
 
         oldS = S;
         oldA = A;
-        //In_PCA(U, X, J - 1);
+        In_PCA(U, X);
         u = X.mean(1);
         C.setCol(1, 0);
         for (int i = 0; i < J - 1; i++) {

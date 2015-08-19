@@ -204,7 +204,7 @@ public class Matrix extends Jama.Matrix {
 
     public double[] mean(int dim) {
         assert (dim == 0 || dim == 1);
-        int m = this.getColumnDimension();
+        int m = this.getRowDimension();
         int n = this.getColumnDimension();
         //double[][] var1 = this.getArray();
         double[] arr = null;
