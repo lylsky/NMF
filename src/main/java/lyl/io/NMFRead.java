@@ -25,16 +25,16 @@ public class NMFRead extends HSIRead{
         int rows = getRows();
         int cols = getCols();
         int NN = context.getNN();
-        //A B*J
-        BufferedReader br = new BufferedReader(new FileReader("/Data/InitA.txt"));
+        //A J*BANDS
+        BufferedReader br = new BufferedReader(new FileReader("Data/InitA.txt"));
         double[][] v_A = A.getArray();
         for (int i = 0; i < J; i++) {
             for (int j = 0; j < bands; j++) {
                 v_A[i][j] = Double.parseDouble(br.readLine());
             }
         }
-        //S J*P
-        br = new BufferedReader(new FileReader("/Data/InitS.txt"));
+        //S L*J
+        br = new BufferedReader(new FileReader("Data/InitS.txt"));
         double[][] v_S = S.getArray();
         for (int i = 0; i < J; i++) {
             for (int j = 0; j < rows * cols; j++) {

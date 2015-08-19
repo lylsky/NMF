@@ -1,7 +1,10 @@
 package lyl.nmf;
 
+import Jama.SingularValueDecomposition;
+import lyl.Matrix.Matrix;
 import lyl.io.HSIRead;
 import org.jblas.DoubleMatrix;
+import org.jblas.FloatMatrix;
 import org.jblas.Singular;
 
 
@@ -20,12 +23,11 @@ public class TMain {
         long l= 122500*192;
 
         long t1 =  System.currentTimeMillis();
-        DoubleMatrix matrix = new DoubleMatrix(data);
-        DoubleMatrix s = Singular.SVDValues(matrix);
-
+        FloatMatrix matrix = new FloatMatrix(new Matrix(data).DTF());
+        Singular.fullSVD(matrix);
+    //    SingularValueDecomposition svd = new Matrix(data).svd();
         long t2 = System.currentTimeMillis();
-        double[] sv = s.data;
-        System.out.println(sv.length+":"+sv[0]);
+        float[] sv = null;
         System.out.println("time:"+(t2-t1));
         System.out.println("");
     }

@@ -4,14 +4,16 @@ package lyl.nmf;
  * Created by lyl on 2015/8/18.
  */
 
+import SVD.SingularValueDecomposition;
 import lyl.Matrix.Matrix;
 import lyl.context.NMFContext;
 import lyl.sort.QuitSort;
 import org.jblas.DoubleMatrix;
+import org.jblas.FloatMatrix;
 import org.jblas.Singular;
 
 /**
- * NMFµÄÊµ¼ÊÔËËã
+ * NMFï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
 public class MVCNMF {
     private double lmin;
@@ -75,6 +77,7 @@ public class MVCNMF {
 
         int low = (int) (len *Pmin);
         lmin = qs.MinK(data, low - 1);
+        dataFilter();
     }
 
     public void In_PCA(Matrix U,Matrix X){
@@ -94,19 +97,19 @@ public class MVCNMF {
 
     }
 
-    public void NMFiteror(){
-        int P = X.getRowDimension();
-        int B = X.getColumnDimension();
+    public void NMFiter(){
+        int P = X.getRowDimension();  //ï¿½ï¿½Ôªï¿½ï¿½ï¿½ï¿½
+        int B = X.getColumnDimension(); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
-        A = context.getA();
-        S = context.getS();
+        A = context.getA();    //J*B
+        S = context.getS();   //P*J
 
-        Matrix Up; //double[P][J];
-        Matrix D; //double[J][J];
-        Matrix Vp; //double[B][J];
+        Matrix Up = new Matrix(P,J); //double[P][J];
+        Matrix D = new Matrix(J,J); //double[J][J];
+        Matrix Vp = new Matrix(B,J); //double[B][J];   *****
         Matrix XVp; //double[P][J];
-        Matrix UptX; //double[J][B];
+        Matrix UptX; //double[J][B];  ****
         Matrix eXVp; //double[P][J + 1];
         Matrix eX; //double[P][B + 1];
         Matrix SSUM = new Matrix(P, J);
@@ -114,12 +117,13 @@ public class MVCNMF {
         double[] Ssum;
         double eX2, Xscale, Rscale, sqrnorm;
 
+/*        FloatMatrix matrix = new FloatMatrix(X.DTF());
+        FloatMatrix[] svd = Singular.fullSVD(matrix);*/
         Jama.SingularValueDecomposition svd = X.svd();
-
+//        DoubleMatrix matrix = new DoubleMatrix(X.getArray());
+//        DoubleMatrix[] svd = Singular.fullSVD(matrix);
         //SingularValueDecomposition svd = new SingularValueDecomposition(X, 1);
-        Up = (Matrix)svd.getU();
-        Vp = (Matrix)svd.getV();
-        D = (Matrix)svd.getS();
+
         XVp = Up.times(D);
         UptX = D.times(Vp.T());
         eXVp = XVp.addCol(stu);

@@ -221,5 +221,19 @@ public class Matrix extends Jama.Matrix {
         return arr;
     }
 
+    public float[][] DTF(){
+        int m = this.getRowDimension();
+        int n = this.getColumnDimension();
+        double[][] var = this.getArray();
+        float[][] res  = new float[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                res[i][j]= (float) var[i][j];
+            }
+        }
+        return res;
+    }
+
+
 
 }
