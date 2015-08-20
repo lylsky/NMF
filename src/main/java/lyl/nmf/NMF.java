@@ -1,5 +1,6 @@
 package lyl.nmf;
 
+import com.mathworks.toolbox.javabuilder.MWException;
 import lyl.context.NMFContext;
 
 /**
@@ -7,7 +8,7 @@ import lyl.context.NMFContext;
  */
 
 /**
- * NMFµÄÖ÷º¯Êý
+ * NMFï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
 public class NMF {
     private NMFContext context;
@@ -24,7 +25,11 @@ public class NMF {
 
         mvcnmf = new MVCNMF();
         mvcnmf.linearMax();
-        mvcnmf.NMFiter();
+        try {
+            mvcnmf.NMFiter();
+        } catch (MWException e) {
+            e.printStackTrace();
+        }
 
     }
 

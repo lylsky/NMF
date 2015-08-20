@@ -33,6 +33,7 @@ public class NMFRead extends HSIRead{
                 v_A[i][j] = Double.parseDouble(br.readLine());
             }
         }
+        A = A.T();
         //S L*J
         br = new BufferedReader(new FileReader("Data/InitS.txt"));
         double[][] v_S = S.getArray();

@@ -122,6 +122,16 @@ public class Matrix extends Jama.Matrix {
         return this;
     }
 
+    public Matrix setRow(double val, int row){
+        int n = this.getColumnDimension();
+        assert row < this.getRowDimension();
+        double[][] var1 = this.getArray();
+        for (int i = 0; i < n; i++) {
+            var1[row][i] = val;
+        }
+        return this;
+    }
+
     public Matrix setMatrix(double[] arr, int dim){
         assert (dim == 0 || dim == 1);
         int m = this.getRowDimension();
@@ -208,6 +218,7 @@ public class Matrix extends Jama.Matrix {
         int n = this.getColumnDimension();
         //double[][] var1 = this.getArray();
         double[] arr = null;
+
         if(dim == 0) {
             arr = this.sum(0);
         }
@@ -232,6 +243,26 @@ public class Matrix extends Jama.Matrix {
             }
         }
         return res;
+    }
+
+    public Matrix timesT(Matrix b){
+        int m = this.getRowDimension();
+        int n = b.getRowDimension();
+        int t = this.getColumnDimension();
+        assert this.getColumnDimension()==b.getColumnDimension();
+        double[][] res = new double[m][n];
+        double[][] ma = this.getArray();
+        double[][] mb = b.getArray();
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                double sum =0;
+                for (int k = 0; k < t; k++) {
+                    sum += ma[i][k]*mb[j][k];
+                }
+                res[i][j]=sum;
+            }
+        }
+        return new Matrix(res);
     }
 
 
